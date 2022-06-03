@@ -1,0 +1,76 @@
+Copy a File from demo_1 to HDFS folder
+
+$hadoop fs -mkdir /pga_28_2
+
+$hadoop fs -ls/
+
+$cd demo_1
+$hadoop fs -copyFromLocal bank.csv /pga_28_2
+$hadoop fs -ls /pga_28_2
+
+
+
+select Country,sum(total) as medals_tally from olympic2020  group by Country order by medals_tally desc limit 5;
+
+
+#Creating a Bucketed Table :
+CREATE TABLE bucketed_tbl_only (
+ empid INT,
+ firstname STRING,
+ lastname STRING,
+ sports STRING,
+ city STRING,
+ Country STRING
+)
+CLUSTERED BY (empid)
+SORTED BY (empid ASC) INTO 4 BUCKETS;
+
+#selecting Bucketing Data:
+select * from bucketed_tbl_only TABLESAMPLE(BUCKET 3 OUT OF 4 ON empid);
+
+------------------------------------------------------------------------------------
+
+CREATE EXTERNAL TABLE IF NOT EXISTS olympic2020_ext(
+name STRING,
+age INT,
+country STRING,
+year INT,
+closing_date STRING,
+game STRING,
+gold INT,
+silver INT,
+bronze INT,
+total INT )
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+STORED AS TEXTFILE
+LOCATION '/pga_28_3'
+TBLPROPERTIES("skip.header.line.count"="1");
+-----------------------------------------------------------------------------------
+
+To start MYSQL in Hadoop : -- mysql -u root -p
+
+-----------------------------------------------------------------------------------
+Sqoop -----
+
+To add incremental import(To ADD NEW DATA):
+sqoop import --connect jdbc:mysql://localhost/pga28 --username root --password password --table EMPLOYEE --m 1 --direct --incremental append --check-column ID --last-value 3  --target-dir /sqoop_pga28
+
+
+---------------------------------------------------------
+Exporting DAta from Hadooop to Mysql TAble:
+sqoop export --connect jdbc:mysql://localhost/pga28 --username root --password password --table employee2 --m 1 --direct --export-dir /sqoop_pga28
+
+
+-----------------------------------------------------------------------------------
+Export data from Hive Table to MYSQL Table:
+
+sqoop export --connect jdbc:mysql://localhost/pga28 --username root --password password --table day_temp --m 1 --direct --export-dir /user/hive/warehouse/day_temp09 --input-fields-terminated-by ','
+
+
+
+
+
+
+
